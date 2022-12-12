@@ -35,11 +35,14 @@ service / on new http:Listener(9090) {
         sql:ParameterizedQuery detailsQuery = `SELECT * FROM citizen where nic = ${id}`;
 
         int fetchedRecords = check mysqlEp->queryRow(countQuery);
+        
         if (fetchedRecords == 0) {
             identityCheckResponse response = {validity: false};
+            check mysqlEp.close();
             return response;
         }
         citizenDetails retrievedData = check mysqlEp->queryRow(detailsQuery);
+        check mysqlEp.close();
         identityCheckResponse response = {validity: true, citizenData: retrievedData};
         return response;
 
